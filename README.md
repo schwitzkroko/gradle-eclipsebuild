@@ -207,3 +207,7 @@ the Eclipse plugin dependencies:
 #### Motivation
 
 The current behavior adds significantly to the build time and it increases the need to be online when building.
+
+## License
+
+The project is licensed under the Eclipse Public License 1.0.
