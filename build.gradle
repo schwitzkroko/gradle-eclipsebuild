@@ -2,7 +2,9 @@ buildscript  {
    repositories {
       // local .m2 folder in user directory
       // mavenLocal()
-
+      maven {
+         url gradleRepositoryUrl
+     }
       maven {
          url gradleRemoteRepositoryUrl
       }
@@ -14,11 +16,13 @@ buildscript  {
 }
 
 plugins {
+   id 'java-gradle-plugin'
    id 'groovy'
    id 'eclipse'
+   id 'idea'
    id 'maven' // for local install
    // id 'maven-publish' 
-   id 'java-gradle-plugin'
+   // id 'com.gradle.plugin-publish'
 }
 // apply plugin: 'maven-publish-auth'
 
@@ -28,13 +32,20 @@ wrapper {
    distributionUrl = "https://services.gradle.org/distributions/gradle-5.2.1-all.zip"
 }
 
+
+group = 'org.eclipse.buildship'
+version = '1.0.0-SNAPSHOT'
+
 afterEvaluate {
    logger.quiet '------------------------------------------------'
    logger.quiet project.group + ":" + archivesBaseName + ":" + project.version
    logger.quiet '------------------------------------------------'
 }
 
+
 repositories {
+   // local .m2 folder in user directory
+   // mavenLocal()
    maven {
       url gradleRemoteRepositoryUrl
    }
@@ -62,6 +73,64 @@ sourceSets {
       groovy { srcDirs = ["src/main/groovy"] } // compile everything with groovy
    }
 }
+
+
+//pluginBundle {
+//   website = 'https://github.com/schwitzkroko/gradle-eclipsebuild'
+//   vcsUrl = 'https://github.com/schwitzkroko/gradle-eclipsebuild'
+//
+//   description = 'Plugin set to build Eclipse plugins in a multi-module build.'
+//   tags = ['gradle-plugin','eclipse-ide','eclipse-plugin','build','gradle','gradle-build']
+//}
+
+gradlePlugin {
+   plugins {
+      UpdateSitePlugin {
+         id = 'eclipsebuild.UpdateSitePlugin'
+         implementationClass = 'eclipsebuild.UpdateSitePlugin'
+      }
+      TestBundlePlugin {
+         id = 'eclipsebuild.TestBundlePlugin'
+         implementationClass = 'eclipsebuild.TestBundlePlugin'
+      }
+      FeaturePlugin {
+         id = 'eclipsebuild.FeaturePlugin'
+         implementationClass = 'eclipsebuild.FeaturePlugin'
+      }
+      BundlePlugin {
+         id = 'eclipsebuild.BundlePlugin'
+         implementationClass = 'eclipsebuild.BundlePlugin'
+      }
+      BuildDefinitionPlugin {
+         id = 'eclipsebuild.BuildDefinitionPlugin'
+         implementationClass = 'eclipsebuild.BuildDefinitionPlugin'
+      }
+   }
+}
+
+task sourcesJar(type: Jar) {
+   description = 'generate a jar file with the source code'
+
+   classifier = 'sources'
+   from sourceSets.main.allSource
+}
+
+// NOTE: The 'artifacts' block is mandatory for usage of the task 'install' (since Gradle 4.8.1; but not for 4.6).
+artifacts {
+   archives sourcesJar
+}
+
+//publishing {
+//   publications {
+//      mavenJava(MavenPublication) {
+//         from components.java
+//
+//         // NOTE: list additional artificats here to be able to use the task 'publishToMavenLocal' which is equal to 'install'
+//         // resolves the artifact tasks
+//         artifact sourcesJar
+//      }
+//   }
+//}
 
 eclipse {
    classpath {
