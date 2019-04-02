@@ -1,0 +1,71 @@
+buildscript  {
+   repositories {
+      // local .m2 folder in user directory
+      // mavenLocal()
+
+      maven {
+         url gradleRemoteRepositoryUrl
+      }
+    }
+
+   // dependencies {
+   //   classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+   // }
+}
+
+plugins {
+   id 'groovy'
+   id 'eclipse'
+   id 'maven' // for local install
+   // id 'maven-publish' 
+   id 'java-gradle-plugin'
+}
+// apply plugin: 'maven-publish-auth'
+
+wrapper {
+   // gradleVersion = '5.2.1'
+   // distributionType = Wrapper.DistributionType.ALL
+   distributionUrl = "https://services.gradle.org/distributions/gradle-5.2.1-all.zip"
+}
+
+afterEvaluate {
+   logger.quiet '------------------------------------------------'
+   logger.quiet project.group + ":" + archivesBaseName + ":" + project.version
+   logger.quiet '------------------------------------------------'
+}
+
+repositories {
+   maven {
+      url gradleRemoteRepositoryUrl
+   }
+}
+
+dependencies {
+
+   // compile fileTree(dir: 'libs', include: ['*.jar'])
+   // libs/org.eclipse.core.runtime_3.9.100.v20131218-1515.jar
+   // libs/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar
+   // libs/org.eclipse.jdt.junit.core_3.7.300.v20140409-1618.jar
+   compile 'org.eclipse.jdt:org.eclipse.jdt.junit.core:3.8.0'
+   // libs/org.eclipse.osgi_3.10.1.v20140909-1633.jar
+   // libs/org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar
+   compile 'org.eclipse.tycho:org.eclipse.osgi.compatibility.state:1.0.200.v20160504-1419'
+   
+   compile 'nu.studer:java-ordered-properties:1.0.1'
+   compile 'org.apache.maven:maven-ant-tasks:2.1.3'
+   compile 'bcel:bcel:5.1'
+}
+
+sourceSets {
+   main {
+      java { srcDirs = [] } // no source dirs for the java compiler
+      groovy { srcDirs = ["src/main/groovy"] } // compile everything with groovy
+   }
+}
+
+eclipse {
+   classpath {
+      downloadJavadoc = true
+      downloadSources = false
+   }
+}
