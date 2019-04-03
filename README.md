@@ -214,7 +214,7 @@ The current behavior adds significantly to the build time and it increases the n
 ## Credits
 
 go to...
--  (Donát Csikós)[https://github.com/donat/], (Eclipse Buildship project)[https://github.com/eclipse/buildship/], Eclipse Foundation and Gradle Inc.
+- [Donát Csikós](https://github.com/donat/), [Eclipse Buildship project](https://github.com/eclipse/buildship/), Eclipse Foundation and Gradle Inc.
 - our employer __[i:FAO](https://www.cytric.net/)__ - an __[amadeus](https://amadeus.com/)__ group company
 
 
