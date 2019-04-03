@@ -9,7 +9,7 @@ https://github.com/eclipse/buildship/tree/master/buildSrc/
 
 see original https://github.com/eclipse/buildship/blob/master/docs/pluginbuild/Usage.md
 
-###Building
+### Building
 
 Buildship is built using a set of plugins that support dependency resolution, processing Eclipse descriptors, and
 publishing Eclipse update sites. The scripts for the plugins are located in the _buildSrc_ folder.
