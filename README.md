@@ -1,4 +1,4 @@
-# Gradle-based Eclipse project build
+# Gradle-based Eclipse plugin build
 
 Refactoring out build sources from Buildship into a Gradle plugin to reuse in other Eclipse plugin projects.
 
