@@ -4,15 +4,11 @@ buildscript  {
       // mavenLocal()
       maven {
          url gradleRepositoryUrl
-     }
+      }
       maven {
          url gradleRemoteRepositoryUrl
       }
     }
-
-   // dependencies {
-   //   classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
-   // }
 }
 
 plugins {
@@ -21,8 +17,9 @@ plugins {
    id 'eclipse'
    id 'idea'
    id 'maven' // for local install
-   // id 'maven-publish' 
+   id 'maven-publish' 
    // id 'com.gradle.plugin-publish'
+   id 'com.gradle.build-scan' version '2.1'
 }
 // apply plugin: 'maven-publish-auth'
 
@@ -33,7 +30,7 @@ wrapper {
 }
 
 
-group = 'org.eclipse.buildship'
+group = 'org.eclipse.buildship.build'
 version = '1.0.0-SNAPSHOT'
 
 afterEvaluate {
@@ -57,10 +54,13 @@ dependencies {
    // libs/org.eclipse.core.runtime_3.9.100.v20131218-1515.jar
    // libs/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar
    // libs/org.eclipse.jdt.junit.core_3.7.300.v20140409-1618.jar
-   compile 'org.eclipse.jdt:org.eclipse.jdt.junit.core:3.8.0'
+   compile('org.eclipse.jdt:org.eclipse.jdt.junit.core:3.8.0') {
+      exclude module: 'org.eclipse.osgi' // too young
+   }
    // libs/org.eclipse.osgi_3.10.1.v20140909-1633.jar
+   compile 'org.eclipse.tycho:org.eclipse.osgi:3.13.0.v20171204-1916'
    // libs/org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar
-   compile 'org.eclipse.tycho:org.eclipse.osgi.compatibility.state:1.0.200.v20160504-1419'
+   compile 'org.eclipse.tycho:org.eclipse.osgi.compatibility.state:1.0.100.v20150402-1551'
    
    compile 'nu.studer:java-ordered-properties:1.0.1'
    compile 'org.apache.maven:maven-ant-tasks:2.1.3'
@@ -86,23 +86,23 @@ sourceSets {
 gradlePlugin {
    plugins {
       UpdateSitePlugin {
-         id = 'eclipsebuild.UpdateSitePlugin'
+         id = project.group + '.' + 'update-site-plugin'
          implementationClass = 'eclipsebuild.UpdateSitePlugin'
       }
       TestBundlePlugin {
-         id = 'eclipsebuild.TestBundlePlugin'
+         id = project.group + '.' + 'test-bundle-plugin'
          implementationClass = 'eclipsebuild.TestBundlePlugin'
       }
       FeaturePlugin {
-         id = 'eclipsebuild.FeaturePlugin'
+         id = project.group + '.' + 'feature-plugin'
          implementationClass = 'eclipsebuild.FeaturePlugin'
       }
       BundlePlugin {
-         id = 'eclipsebuild.BundlePlugin'
+         id = project.group + '.' + 'bundle-plugin'
          implementationClass = 'eclipsebuild.BundlePlugin'
       }
       BuildDefinitionPlugin {
-         id = 'eclipsebuild.BuildDefinitionPlugin'
+         id = project.group + '.' + 'build-definition-plugin'
          implementationClass = 'eclipsebuild.BuildDefinitionPlugin'
       }
    }
@@ -135,6 +135,11 @@ artifacts {
 eclipse {
    classpath {
       downloadJavadoc = true
-      downloadSources = false
+      downloadSources = true
    }
+}
+
+buildScan {
+   termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+   termsOfServiceAgree = 'yes'
 }

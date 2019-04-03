@@ -2,9 +2,12 @@
 
 Refactoring out build sources from Buildship into a Gradle plugin to reuse in other Eclipse plugin projects.
 
+This is no original work of ours, code base was taken from here, git repo migrated and pruned: 
+https://github.com/eclipse/buildship/tree/master/buildSrc/
+
 ## Usage
 
-see https://github.com/eclipse/buildship/blob/master/docs/pluginbuild/Usage.md
+see original https://github.com/eclipse/buildship/blob/master/docs/pluginbuild/Usage.md
 
 ###Building
 
@@ -154,7 +157,7 @@ file under the _repository/properties_ node. The `signBundles` specifies whether
 
 ## Development - Stories
 
-see https://github.com/eclipse/buildship/blob/master/docs/stories/Build.md
+see original https://github.com/eclipse/buildship/blob/master/docs/stories/Build.md
 
 ### ~~Only declare plugin dependencies in the MANIFEST.MF file~~
 
@@ -207,6 +210,13 @@ the Eclipse plugin dependencies:
 #### Motivation
 
 The current behavior adds significantly to the build time and it increases the need to be online when building.
+
+## Credits
+
+go to...
+-  (Donát Csikós)[https://github.com/donat/], (Eclipse Buildship project)[https://github.com/eclipse/buildship/], Eclipse Foundation and Gradle Inc.
+- our employer __[i:FAO](https://www.cytric.net/)__ - an __[amadeus](https://amadeus.com/)__ group company
+
 
 ## License
 
