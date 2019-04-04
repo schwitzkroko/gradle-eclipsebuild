@@ -1,39 +1,53 @@
 # Gradle-based Eclipse plugin build
 
-Refactoring out build sources from Buildship into a Gradle plugin to reuse in other Eclipse plugin projects.
+Refactoring out build sources from [Buildship](https://github.com/eclipse/buildship/) into a Gradle plugin to reuse in other Eclipse plugin projects.
 
-This is no original work of ours, code base was taken from here, git repo migrated and pruned: 
+
+## Status
+
+Except organizing a Gradle build this project so far _does not contain original work of ours_, code base was taken from here, git repo migrated and pruned: 
 https://github.com/eclipse/buildship/tree/master/buildSrc/
 
-## Usage
+This documentation is work in progress, and originally obtained from the Buildship too: [original Usage.md]( https://github.com/eclipse/buildship/blob/master/docs/pluginbuild/Usage.md), [original stories/Build.md](https://github.com/eclipse/buildship/blob/master/docs/stories/Build.md).
 
-see original https://github.com/eclipse/buildship/blob/master/docs/pluginbuild/Usage.md
+We use _eclipsebuild_ plugin internally at i:FAO for building our own Eclipse plugins.
+
+## Usage
 
 ### Building
 
 Buildship is built using a set of plugins that support dependency resolution, processing Eclipse descriptors, and
-publishing Eclipse update sites. The scripts for the plugins are located in the _buildSrc_ folder.
+publishing Eclipse update sites. ~~The scripts for the plugins are located in the _buildSrc_ folder.~~
 
-The plugin scripts in _buildSrc_ expect a small set of Eclipse bundles/libraries in the
-_buildSrc/libs_ folder that are committed to the Git repository to avoid bootstrapping problems. All
+~~The plugin scripts in _buildSrc_ expect a small set of Eclipse bundles/libraries in the
+_buildSrc/libs_ folder that are committed to the Git repository to avoid bootstrapping problems.~~ All
 plugins are defined in the `eclipsebuild` package.
 
 The plugin version is specified in the _version.txt_ file.
 
 
-#### BuildDefinitionPlugin
+| Plugin set overview | comment |
+| ---- | ---- |
+| _org.eclipse.buildship.build.build-definition-plugin_ | applied to multi-module ROOT project |
+| _org.eclipse.buildship.build.bundle-plugin_ | applied to OSGi bundle subprojects |
+| _org.eclipse.buildship.build.test-bundle-plugin_ | applied to test bundle subprojects |
+| _org.eclipse.buildship.build.feature-plugin_ | applied to a Eclipse feature subproject |
+| _org.eclipse.buildship.build.update-site-plugin_ | applied to a subproject that generates a p2 update site for features/plugins |
 
-The `BuildDefinitionPlugin` Gradle plugin has to be applied on the root project. It defines the target platform for
+
+#### build-definition-plugin
+
+The `build-definition-plugin` Gradle plugin has to be applied on the root project. It defines the target platform for
 the build and makes all Eclipse plugins available for dependency resolution. The `BundlePlugin`, `FeaturePlugin`, and
 `UpdateSitePlugin` Gradle plugins all depend on the tasks provided by the `BuildDefinitionPlugin`.
 
 The set of supported target platforms are declared in the root _build.gradle_ file. For example:
-
-    apply plugin: eclipsebuild.BuildDefinitionPlugin
-
+```
+    apply plugin: org.eclipse.buildship.build.build-definition-plugin
+    
     eclipseBuild {
         defaultEclipseVersion = '44'
-
+    
         targetPlatform {
             eclipseVersion = '44'
             targetDefinition = file('tooling-e44.target')
@@ -41,17 +55,19 @@ The set of supported target platforms are declared in the root _build.gradle_ fi
                 'org.eclipse.core.runtime' : '3.10.0.v20140318-2214'
             ]
         }
-
+    
         targetPlatform {
              eclipseVersion = '43'
              ...
          }
      }
+```
 
 When running a Gradle build using the above configuration, the build uses the Eclipse target platform version `44`. The
 build can use an alternative target platform by specifying the `eclipse.version` Gradle project property. For example:
-
+```
     gradle build -Peclipse.version=43
+```
 
 The contributed task `installTargetPlatform` creates the target platform. It does the following:
 
@@ -61,54 +77,59 @@ The contributed task `installTargetPlatform` creates the target platform. It doe
 
 Once the 'mavenized' target platform is available, the Gradle build configuration can reference Eclipse plugin dependencies
 like any other dependency. The _groupId_ is always `eclipse`. For example:
-
+```
     compile 'eclipse:org.eclipse.jdt.ui:+'
+```
 
 By default, the location of the generated target platform is _~/.tooling/eclipse/targetPlatforms_. The location can be
 customized by specifying the `targetPlatformsDir` Gradle project property:
-
+```
     gradle installTargetPlatform -PtargetPlatformsDir=/path/to/target/platform
+```
 
 
 The `versionMapping` can be used to define exact plugin dependency versions per target platform. A bundle can define a dependency
 through the {@code withEclipseBundle()} method like
-
+```
     compile withEclipseBundle('org.eclipse.core.runtime')
+```
 
 If the active target platform has a version mapped for the dependency then that version is used, otherwise an unbound version range (+) is applied.
 
 
-#### BundlePlugin
+#### bundle-plugin
 
-The `BundlePlugin` Gradle plugin knows how to build Eclipse plugins and needs to be applied on the plugin project(s). The plugin creates
+The `bundle-plugin` Gradle plugin knows how to build Eclipse plugins and needs to be applied on the plugin project(s). The plugin creates
 a jar file containing all elements defined in the feature project's _build.properties_. The bundle manifest file _META-INF/MANIFEST.MF_
 is copied into the generated jar file and the version is replaced with the one from the current build.
 
 The `BundlePlugin` also adds the capability to bundle jars along with the dependencies from the target platform. This can be
 achieved by declaring `bundled` dependencies. For example:
-
-    apply plugin: eclipsebuild.BundlePlugin
-
+```
+    apply plugin: org.eclipse.buildship.build.bundle-plugin
+    
     dependencies {
         compile 'eclipse:org.eclipse.core.runtime:+'
         bundled 'com.google.guava:guava:18.0'
     }
+```
 
 The dependencies of the `bundled` configuration are used by the `updateLibs` task. This task downloads the transitive
 dependencies into the _lib_ folder, updates the manifest file to reference these dependencies and updates the _.classpath_ file.
 
 
-#### TestBundlePlugin
+#### test-bundle-plugin
 
-The `TestBundlePlugin` Gradle plugin is an extension of the `BundlePlugin` and knows how to run tests. For example:
-
-    apply plugin: eclipsebuild.TestBundlePlugin
-
+The ` test-bundle-plugin` Gradle plugin is an extension of the `bundle-plugin` and knows how to run tests. For example:
+```
+    apply plugin: org.eclipse.buildship.build.test-bundle-plugin
+    
     eclipseTest {
         fragmentHost 'org.eclipse.buildship.core'
         applicationName 'org.eclipse.pde.junit.runtime.coretestapplication'
         optionsFile file('.options')
     }
+```
 
 The plugin adds a task called `eclipseTest`. This task does the following:
 
@@ -122,26 +143,27 @@ Currently all concrete classes are gathered by the test plugin for test executio
 The implementation uses techniques defined in the article [PDE Unit Tests using Ant](http://www.eclipse.org/articles/article.php?file=Article-PDEJUnitAntAutomation/index.html).
 
 
-#### FeaturePlugin
+#### feature-plugin
 
-The `FeaturePlugin` Gradle plugin knows how to build an Eclipse feature and needs to be applied on the feature project(s). The plugin creates
+The `feature-plugin` Gradle plugin knows how to build an Eclipse feature and needs to be applied on the feature project(s). The plugin creates
 a jar file containing all elements defined in the feature project's _build.properties_.
 
 
-#### UpdateSitePlugin
+#### update-site-plugin
 
-The `UpdateSitePlugin` Gradle plugin knows how to build an update site and needs to be applied on the site project. The plugins adds
+The `update-site-plugin` Gradle plugin knows how to build an update site and needs to be applied on the site project. The plugins adds
 a task called `createP2Repository`. This task takes all project dependencies and, if they are either Eclipse plugins or Eclipse features, publishes
 them to a local P2 repository. The generated repository is available in the _build/repository_ folder. For example:
-
-    apply plugin: eclipsebuild.UpdateSitePlugin
-
+```
+    apply plugin: org.eclipse.buildship.build.update-site-plugin
+    
     updateSite {
         siteDescriptor = file('category.xml')
         extraResources = files('epl-v10.html', 'readme.txt')
         p2ExtraProperties = ['p2.mirrorsURL' : 'http://www.eclipse.org/downloads/download.php?file=/path/to/repository&format=xml' ]
         signBundles = true
     }
+```
 
 The `siteDescriptor` should point to a category descriptor which is used to publish update sites. The `extraResources` allows to reference
 extra resources to add to the update site. The `p2ExtraProperties` allows to add _properties_ elements to the update site's _artifacts.xml_
@@ -154,68 +176,11 @@ file under the _repository/properties_ node. The `signBundles` specifies whether
 * Create a _build.gradle_ file and apply the `BundlePlugin`
 * Add the project to the _settings.gradle_ file
 
-
-## Development - Stories
-
-see original https://github.com/eclipse/buildship/blob/master/docs/stories/Build.md
-
-### ~~Only declare plugin dependencies in the MANIFEST.MF file~~
-
-#### Requested Change
-
-Only declare the Eclipse plugin dependencies in the _MANIFEST.MF_ file and have the _build.gradle_ file read
-the dependency information described in the _MANIFEST.MF_ file.
-
-#### Motivation
-
-Avoid the redundancy between the declaration of Eclipse plugin dependencies in _build.gradle_ and in _MANIFEST.MF_.
-
-
-### ~~Only declare target definitions in the .target files~~
-
-#### Requested Change
-
-Only declare the target definitions in the .target files and have the build file of the Gradle root project read
-the target platform information described in the .target definition files.
-
-#### Motivation
-
-Avoid the redundancy between the declaration of target platforms in the .target definition files and the build
-file of the Gradle root project.
-
-
-### ~~Upload daily snapshots to eclipse.org~~
-
-#### Requested Change
-
-Upload each daily snapshot of Buildship to the eclipse.org downloads area via SFTP.
-
-#### Motivation
-
-We want to offer the latest snapshot of Buildship to our users in an automated manner.
-
-
-### ~~Restrict Eclipse plugin dependency lookups to the mavenized repository~~
-
-#### Requested Change
-
-Currently, all Eclipse plugin dependencies are declared with wildcard versions. Thus, each repository registered in
-the build is queried to find the latest version for a given Eclipse plugin dependency. Avoid this broad lookup of
-the Eclipse plugin dependencies:
-
- * Use fixed dependency versions (provide a map with dependency versions per target platform).
- * Limit the lookup to the mavenized repository for all groups named _eclipse_.
- * Provide an even deeper integration into Gradle dependency management.
-
-#### Motivation
-
-The current behavior adds significantly to the build time and it increases the need to be online when building.
-
 ## Credits
 
-go to...
+Credits go to:
 - [Donát Csikós](https://github.com/donat/), [Eclipse Buildship project](https://github.com/eclipse/buildship/), Eclipse Foundation and Gradle Inc.
-- our employer __[i:FAO](https://www.cytric.net/)__ - an __[amadeus](https://amadeus.com/)__ group company
+- our employer [i:FAO](https://www.cytric.net/) - an [amadeus](https://amadeus.com/) group company
 
 
 ## License
