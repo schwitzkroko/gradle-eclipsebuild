@@ -144,13 +144,13 @@
         versionRange="[3.3.0,4.0.0)"/>
     <requirement
         name="net.ifao.oomph.buildshipimport.feature.group"
-        versionRange="[0.0.0,2.0.0)"/>
+        versionRange="[1.0.0,2.0.0)"/>
     <repository
         url="${oomph.update.url}"/>
     <repository
         url="https://dist.springsource.org/release/GRECLIPSE/e4.10"/>
     <repository
-        url="https://dl.bintray.com/schwitzkroko/eclipse-releases-e410/net.ifao.oomph.setup.buildship/0.0.9.v20190408/"/>
+        url="https://dl.bintray.com/schwitzkroko/eclipse-snapshots-e410/net.ifao.oomph.setup.buildship/1.0.0.v20190408-s/"/>
     <description>Install the tools needed in the IDE to work with the source code for ${scope.project.label}</description>
   </setupTask>
   <setupTask
