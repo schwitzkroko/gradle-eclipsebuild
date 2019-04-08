@@ -18,8 +18,8 @@ plugins {
    id 'eclipse'
    id 'maven-publish' 
    // id 'com.gradle.plugin-publish'
-   id 'com.jfrog.bintray' version "1.8.4"
-   id 'com.gradle.build-scan' version '2.1'
+   id 'com.jfrog.bintray' version '1.8.4'
+   id 'com.gradle.build-scan' version '2.2.1'
 }
 // apply plugin: 'maven-publish-auth'
 
@@ -133,8 +133,8 @@ publishing {
 }
 
 bintray {
-   user = property('user')
-   key = property('key')
+   user = System.getProperty('user', 'undefined_user')
+   key = System.getProperty('key', 'undefined_key')
    publications = ['PluginSetPublication']
    pkg {
       repo = 'test'

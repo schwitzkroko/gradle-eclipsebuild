@@ -176,6 +176,16 @@ file under the _repository/properties_ node. The `signBundles` specifies whether
 * Create a _build.gradle_ file and apply the `BundlePlugin`
 * Add the project to the _settings.gradle_ file
 
+## Building/deployin this Gradle plugin
+
+```
+$ ./gradlew clean build
+```
+
+```
+$ ./gradlew build bintrayUpload -Duser=<bintray_user> -Dkey=<bintray_key>
+```
+
 ## Credits
 
 Credits go to:
