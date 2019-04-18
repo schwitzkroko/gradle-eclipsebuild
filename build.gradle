@@ -55,7 +55,7 @@ dependencies {
    // libs/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar
    // libs/org.eclipse.jdt.junit.core_3.7.300.v20140409-1618.jar
    compile('org.eclipse.jdt:org.eclipse.jdt.junit.core:3.8.0') {
-      exclude module: 'org.eclipse.osgi' // too young
+      exclude module: 'org.eclipse.osgi' // transitive are too young
    }
    // libs/org.eclipse.osgi_3.10.1.v20140909-1633.jar
    compile 'org.eclipse.tycho:org.eclipse.osgi:3.13.0.v20171204-1916'
@@ -74,7 +74,7 @@ sourceSets {
    }
 }
 
-
+// TODO (schwitzkroko) evaluate this later
 //pluginBundle {
 //   website = 'https://github.com/schwitzkroko/gradle-eclipsebuild'
 //   vcsUrl = 'https://github.com/schwitzkroko/gradle-eclipsebuild'
@@ -133,8 +133,8 @@ publishing {
 }
 
 bintray {
-   user = System.getProperty('user', 'undefined_user')
-   key = System.getProperty('key', 'undefined_key')
+   user = System.getProperty('bintray_user', 'undefined_bintray_user')
+   key = System.getProperty('bintray_key', 'undefined_bintray_keyy')
    publications = ['PluginSetPublication']
    pkg {
       repo = 'test'
